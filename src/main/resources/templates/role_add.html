@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>角色添加</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="x-body">
+    <form action="" method="" class="layui-form layui-form-pane" id="form1">
+        <div class="layui-form-item">
+            <label for="usercode" class="layui-form-label"><span class="x-red">*</span>用户名</label>
+            <div class="layui-input-inline">
+                <select id="usercode" name="usercode">
+                    <option value="0" style="display: none">--请选择用户名--</option>
+                    <option th:each="list:${codes}" th:value="${list}" th:text="${list}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="rolename" class="layui-form-label"><span class="x-red">*</span>角色名</label>
+            <div class="layui-input-inline">
+                <select id="rolename" name="rolename">
+                    <option value="0" style="display: none">--请选择角色名--</option>
+                    <option th:each="list:${roles}" th:value="${list}" th:text="${list}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">拥有权限</label>
+            <table class="layui-table layui-input-block">
+                <tbody>
+                <tr>
+                    <td th:text="用户管理"></td>
+                    <td>
+                        <div class="layui-input-block">
+                            <input name="operation" lay-skin="primary" type="checkbox" value="delete" title="用户删除"/>
+                            <input name="operation" lay-skin="primary" type="checkbox" value="update" title="用户修改"/>
+                            <input name="operation" lay-skin="primary" type="checkbox" value="insert" title="用户插入"/>
+                            <input name="operation" lay-skin="primary" type="checkbox" value="select" title="用户查询"/>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label for="remark" class="layui-form-label">描述</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" id="remark" name="remark" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: center">
+            <button class="layui-btn" onclick="submits()" lay-filter="add">增加</button>
+        </div>
+    </form>
+</div>
+<script>
+    function submits() {
+        $.ajax({
+            url: "/userInfo/insertRole",
+            type: "post",
+            traditional: true,
+            data: $("#form1").serialize(),
+            dataType: "json",
+            success: function (result) {
+                if (result.result == "success"){
+                    layer.msg('保存成功!', {icon: 1, time: 2000});
+                    parent.location.reload();
+                }else{
+                    layer.msg('保存失败!', {icon: 1, time: 1000});
+                }
+            }, error: function () {
+                layer.msg('保存失败!', {icon: 1, time: 1000});
+            }
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>日常活动页面</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">演示</a>
+        <a><cite>导航元素</cite></a>
+      </span>
+    <a class="layui-btn layui-btn-primary layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:38px">ဂ</i></a>
+</div>
+<div class="x-body">
+    <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+            <div class="layui-input-inline">
+                <input class="layui-input" id="dailyactive" name="dailyactive" placeholder="活动名称"
+                       th:value="${session.activekey}"/>
+            </div>
+            <button class="layui-btn" lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+        </form>
+    </div>
+    <xblock>
+        <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
+        <button class="layui-btn" onclick="x_admin_show('添加用户','/active/addactive')"><i class="layui-icon"></i>添加
+        </button>
+        <span class="x-right" style="line-height:40px">共有数据：<span th:text="${totalCount}"></span> 条</span>
+    </xblock>
+    <table class="layui-table layui-form">
+        <thead>
+        <tr>
+            <th width="20">
+                <div class="layui-unselect header layui-form-checkbox" lay-skin="primary">
+                    <i class="layui-icon">&#xe605;</i>
+                </div>
+            </th>
+            <td>日常活动</td>
+            <td>活动时间</td>
+            <td>活动小提示</td>
+            <td>操作</td>
+        </tr>
+        </thead>
+        <tbody class="x-cate">
+        <tr cate-id='1' fid='0' th:each="alist:${activityList}">
+            <td>
+                <div class="layui-unselect layui-form-checkbox" lay-skin="primary" th:data-id="${alist.id}">
+                    <i class="layui-icon">&#xe605;</i>
+                </div>
+            </td>
+            <td th:text="${alist.dailyactive}"></td>
+            <td th:text="${#dates.format(alist.activetime,'HH:mm:ss')}"></td>
+            <td th:text="${alist.dailytip}"></td>
+            <td class="td-manage">
+                <a title="编辑" th:onclick="'javascript:activeedit(\''+${alist.id}+'\')'" href="javascript:;">
+                    <i class="layui-icon">&#xe642;</i>
+                </a>
+                <a title="删除" th:onclick="'javascript:activedel(\''+${alist.id}+'\')'" href="javascript:;">
+                    <i class="layui-icon">&#xe640;</i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="page">
+        <div>
+            <a class="prev"
+               th:href="@{/active/oldactive(currPage=${currPage}-1, active=${session.activekey})}">&lt;&lt;</a>
+            <span class="current" th:text="${currPage}"></span>
+            <a class="next"
+               th:href="@{/active/oldactive(currPage=${currPage}+1, active=${session.activekey})}">&gt;&gt;</a>
+        </div>
+    </div>
+</div>
+<script>
+    function activeedit(id) {
+        x_admin_show("编辑", "/active/editactive/" + id);
+    }
+
+    function activedel(id) {
+        var check = $.makeArray(id);
+        layer.confirm('确认要删除吗？', function () {
+            $.ajax({
+                type: "post",
+                url: "/active/delactive",
+                data: {"check": check},
+                traditional:true,
+                dataType: "json",
+                success: function (result) {
+                    if (result.success == "success") {
+                        layer.msg('已删除!', {
+                            icon: 1, time: 1000, end: function () {
+                                window.location.reload();
+                            }
+                        });
+                    } else {
+                        layer.msg('删除失败!',{icon: 1, time: 1000});
+                    }
+                }, error: function () {
+                    layer.msg('删除失败!', {icon: 1, time: 1000 });
+                }
+            });
+        });
+    }
+
+    function delAll() {
+        var check = tableCheck.getData();
+        layer.confirm('确认要删除吗？', function () {
+            $.ajax({
+                url: "/active/delactive",
+                type: "post",
+                traditional: true,
+                data: {"check":check},
+                dataType:"json",
+                success: function () {
+                    layer.msg('已删除!', {icon: 1, time: 1000,end:function () {
+                            window.location.reload();
+                        }});
+                }, error: function () {
+                    layer.msg('删除失败!', {icon: 1, time: 1000});
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>

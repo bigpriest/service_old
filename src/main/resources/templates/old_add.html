@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>老人添加页面</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body">
+    <form class="layui-form" id="form1" action="" method="">
+        <div class="layui-form-item">
+            <label for="old_code" class="layui-form-label">
+                <span class="x-red">*</span>老人编号
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="old_code" name="old_code" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="old_name" class="layui-form-label">
+                <span class="x-red">*</span>老人名称
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="old_name" name="old_name" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="old_age" class="layui-form-label">
+                <span class="x-red">*</span>老人年龄
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="old_age" name="old_age" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"><span class="x-red">*</span>老人性别</label>
+            <div class="layui-input-block">
+                <input type="radio" name="old_gender" lay-skin="primary" th:value="1" title="男" checked="checked"/>
+                <input type="radio" name="old_gender" lay-skin="primary" th:value="2" title="女" />
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="disease_id" required class="layui-form-label">
+                <span class="x-red">*</span>患&emsp;&emsp;病
+            </label>
+            <div class="layui-input-inline">
+                <select  id="disease_id" required name="disease_id">
+                    <option value="" text="---请选择---" selected="selected"></option>
+                    <option th:each="disease:${dlist}" th:value="${disease.id}" th:text="${disease.disease}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="roomid"  class="layui-form-label">
+                <span class="x-red">*</span>房&emsp;&emsp;号
+            </label>
+            <div class="layui-input-inline">
+                <select  id="roomid" name="roomid" required>
+                    <option value="" text="---请选择---" selected="selected"></option>
+                    <option th:each="room:${rlist}" th:value="${room.id}" th:text="${room.room_code}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="user_id" class="layui-form-label">
+                <span class="x-red">*</span>负责人
+            </label>
+            <div class="layui-input-inline">
+                <select  id="user_id" name="user_id">
+                    <option value="" text="---请选择---" selected="selected"></option>
+                    <option th:each="user:${ulist}" th:value="${user.id}" th:text="${user.username}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: center">
+            <button class="layui-btn" type="button" id="btn">保存添加</button>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $("#btn").click(function () {
+            $.ajax({
+                type: "post",
+                url: "/oldman/addoldinfo",
+                data: $("#form1").serialize(),
+                dataType: "json",
+                success:function (result) {
+                    //获取当前iframe页面，并关闭
+                    if(result.result == "success"){
+                        layer.msg('保存成功!', {icon: 1, time: 1000,end:function () {
+                                parent.location.reload();
+                            }});
+                    }else {
+                        layer.msg('保存失败!房间人数已满！', {icon: 1, time: 1000});
+                    }
+                }, error:function () {
+                    layer.msg('保存失败!', {icon: 1, time: 1000});
+                }
+            });
+        });
+    });
+
+    layui.use(['form', 'layer'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+            , layer = layui.layer;
+        //自定义验证规则
+        form.verify({
+            nikename: function (value) {
+                if (value.length < 5) {
+                    return '昵称至少得5个字符啊';
+                }
+            }
+            , pass: [/(.+){6,12}$/, '密码必须6到12位']
+            , repass: function (value) {
+                if ($('#L_pass').val() != $('#L_repass').val()) {
+                    return '两次密码不一致';
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

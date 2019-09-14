@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="makert.makert_demo.dao.HealthMapper">
+    <resultMap id="healthmap" type="Health">
+        <id property="id" column="id"></id>
+        <result property="bloodpressure" column="bloodpressure"></result>
+        <result property="bloodsugar" column="bloodsugar"></result>
+        <result property="bloodfat" column="bloodfat"></result>
+        <result property="temperature" column="temperature"></result>
+        <result property="eyes" column="eyes"></result>
+        <result property="bone" column="bone"></result>
+        <result property="time" column="time"></result>
+        <association property="oldman" column="old_id" javaType="Oldman">
+            <id property="id" column="id"></id>
+            <result property="old_name" column="old_name"></result>
+        </association>
+    </resultMap>
+    <select id="findoldhealth" resultMap="healthmap">
+        select h.*,o.* from healthy h left join oldman o on h.oldid=o.id
+        <where>
+            <if test="oldid!=null and oldid!=''">
+                and oldid = #{oldid}
+            </if>
+        </where>
+        limit #{startRow},#{endRow}
+    </select>
+    <insert id="addhealth" parameterType="Health">
+        insert into healthy (oldid,bloodpressure,bloodsugar,bloodfat,temperature,eyes,bone,time)
+        values (#{oldid},#{bloodpressure},#{bloodsugar},#{bloodfat},#{temperature},#{eyes},#{bone},#{time});
+    </insert>
+    <select id="findhealthcount" resultType="int">
+        select count(*) from healthy
+        <where>
+            <if test="oldid!=null and oldid!=''">
+                and oldid=#{oldid}
+            </if>
+        </where>
+    </select>
+    <delete id="delhealth" parameterType="int">
+        delete from healthy where id=#{id}
+    </delete>
+    <select id="findbyid" resultType="Health" parameterType="int">
+        select h.*,o.* from healthy h left join oldman o on h.oldid=o.id where h.id=#{id}
+    </select>
+    <update id="edithealth" parameterType="Health">
+        update healthy set bloodpressure = #{bloodpressure},bloodsugar = #{bloodsugar},
+        bloodfat=#{bloodfat},temperature=#{temperature},eyes=#{eyes},bone=#{bone}
+        where oldid= #{oldid};
+    </update>
+</mapper>

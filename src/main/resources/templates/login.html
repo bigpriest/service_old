@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录注册界面</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/css/login.css}">
+</head>
+<body>
+<div id="wrapper" class="login-page">
+    <div id="login_form" class="form">
+        <form class="register-form">
+            <h2>创建账号</h2>
+            <input type="text" placeholder="账号" name="usercode" id="usercode"/>
+            <input type="password" placeholder="密码" name="pwd" id="pwd"/>
+            <input type="password" placeholder="密码" name="pwd1" id="pwd1" onblur="jiaoyan()"/>
+            <button id="create" disabled="true">创建账户</button>
+            <p class="message">已经有了一个账户? <a href="#">立刻登录</a></p>
+        </form>
+        <form class="login-form" action="/larController/login" method="post">
+            <h2>管理登录</h2>
+            <input type="text" placeholder="账号" name="username" id="username"/>
+            <input type="password" placeholder="密码" name="password" id="password"/>
+            <div style="color: red" th:text="${result}=='fail'?'用户名或密码错误':''"></div>
+            <button id="login">登　录</button>
+            <p class="message">还没有账户? <a href="#">立刻创建</a></p>
+        </form>
+    </div>
+</div>
+<script th:src="@{/static/js/jquery.min.js}"></script>
+<script type="text/javascript">
+    function jiaoyan() {
+        var pwd1 = $("#pwd").val();
+        var pwd2 = $("#pwd1").val();
+        if(pwd1 == pwd2) {
+            $("#create").attr("disabled",false);
+        } else {
+            layer.msg('密码不一致!', {icon: 1, time: 1000});
+            $("#create").attr("disabled",true);
+        }
+    }
+    $(function () {
+        $('.message a').click(function () {
+            $('form').animate({
+                height: 'toggle',
+                opacity: 'toggle'
+            }, 'slow');
+        });
+        $("#create").click(function() {
+            var jsonData = {"usercode": $("#usercode").val(), "pwd": $("#pwd").val()};
+            $.ajax({
+                type: "POST",
+                url: "/larController/register",
+                data: jsonData,
+                dataType: "json",
+                success: function (result) {
+                    alert(result.result);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

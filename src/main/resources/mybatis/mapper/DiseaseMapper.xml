@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="makert.makert_demo.dao.DiseaseMapper">
+    <resultMap id="diseasemap" type="Disease">
+        <id property="id" column="id"></id>
+        <result property="disease" column="disease"></result>
+    </resultMap>
+    <select id="findsisease" resultMap="diseasemap">
+        select * from disease;
+    </select>
+</mapper>

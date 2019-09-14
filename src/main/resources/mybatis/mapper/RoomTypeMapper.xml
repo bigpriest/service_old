@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="makert.makert_demo.dao.RoomTypeMapper">
+    <resultMap id="roomtypemap" type="RoomType">
+        <id property="id" column="id"/>
+        <result property="roomtypecode" column="roomtypecode"/>
+        <result property="roomtype" column="roomtype"/>
+        <result property="description" column="description"/>
+        <result property="createtime" column="createtime"/>
+    </resultMap>
+    <select id="roomtypeinfo" resultMap="roomtypemap">
+        select * from roomtype
+        <where>
+            <if test="roomtypecode!=null and roomtypecode!=''">
+                and roomtypecode like CONCAT('%',#{roomtypecode},'%')
+            </if>
+            <if test="roomtype!=null and roomtype!=''">
+                and roomtype=#{roomtype}
+            </if>
+        </where>
+        limit #{startRow},#{endRow}
+    </select>
+    <select id="findroomtypecount" resultType="int">
+        select count(*) from roomtype
+        <where>
+            <if test="roomtypecode!=null and roomtypecode!=''">
+                and roomtypecode like CONCAT('%',#{roomtypecode},'%')
+            </if>
+            <if test="roomtype!=null and roomtype!=''">
+                and roomtype=#{roomtype}
+            </if>
+        </where>
+    </select>
+    <select id="findroomtype" resultMap="roomtypemap">
+        select * from roomtype
+    </select>
+    <delete id="delroomtype" parameterType="int">
+        delete from roomtype where id = #{delroomtype}
+    </delete>
+    <insert id="addroomtypesave" parameterType="RoomType">
+        insert into roomtype (roomtypecode,roomtype,description) values (#{roomtypecode},#{roomtype},#{description});
+    </insert>
+    <select id="findroomtypebyid" resultType="RoomType" parameterType="int">
+        select * from roomtype where id=#{id}
+    </select>
+    <update id="editroomtypesave" parameterType="RoomType">
+        update roomtype set roomtype=#{roomtype},description=#{description} where roomtypecode=#{roomtypecode};
+    </update>
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="makert.makert_demo.dao.ActivityMapper">
+    <resultMap id="activemap" type="Activity">
+        <id property="id" column="id"></id>
+        <result property="dailyactive" column="dailyactive"></result>
+        <result property="activetime" column="activetime"></result>
+        <result property="dailytip" column="dailytip"></result>
+    </resultMap>
+    <!--查询活动列表，包含条件查询-->
+    <select id="activeinfo" resultMap="activemap">
+        select * from active
+        <where>
+            <if test="dailyactive!=null and dailyactive!=''">
+                and dailyactive like CONCAT('%',#{dailyactive},'%')
+            </if>
+        </where>
+        order by activetime
+        limit #{startRow},#{endRow}
+    </select>
+    <!--查找记录数-->
+    <select id="findactivecount" resultType="int">
+        select count(*) from active
+        <where>
+            <if test="dailyactive!=null and dailyactive!=''">
+                and dailyactive like CONCAT('%',#{dailyactive},'%')
+            </if>
+        </where>
+    </select>
+    <insert id="addactive" parameterType="Activity">
+        insert into active (dailyactive,activetime,dailytip) values (#{dailyactive},#{activetime},#{dailytip});
+    </insert>
+    <delete id="delactive" parameterType="int">
+        delete from active where id=#{id}
+    </delete>
+    <select id="findbyactiveid" parameterType="int" resultType="Activity">
+        select * from active where id=#{id};
+    </select>
+    <update id="editactive" parameterType="Activity">
+        update active set activetime=#{activetime},dailytip=#{dailytip} where dailyactive=#{dailyactive}
+    </update>
+</mapper>

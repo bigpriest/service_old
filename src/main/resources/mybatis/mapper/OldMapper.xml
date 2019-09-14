@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="makert.makert_demo.dao.OldMapper">
+    <resultMap id="OldResultMap" type="Oldman">
+        <!--   老人信息     -->
+        <id column="id" property="id"/>
+        <result column="old_code" property="old_code"/>
+        <result column="old_name" property="old_name"/>
+        <result column="old_age" property="old_age"/>
+        <result column="old_gender" property="old_gender"/>
+        <result column="phone" property="phone"/>
+        <!--   联疾病表查询     -->
+        <association property="disease" javaType="Disease" column="disease_id">
+            <id property="id" column="id"></id>
+            <result property="disease" column="disease"></result>
+        </association>
+        <!--   联房间查询     -->
+        <association property="room" javaType="Room" column="roomid">
+            <id property="id" column="id"></id>
+            <result property="room_code" column="room_code"></result>
+            <!--    联房间类型查询      -->
+            <association property="roomType" javaType="RoomType" column="roomtype_id">
+                <id property="id" column="id"></id>
+                <result property="roomtype" column="roomtype"></result>
+            </association>
+        </association>
+        <!--    联人员表       -->
+        <association property="user" javaType="User" column="user_id">
+            <id property="id" column="id"></id>
+            <result property="usercode" column="usercode"></result>
+            <result property="username" column="username"></result>
+        </association>
+    </resultMap>
+    <select id="oldInfo" resultMap="OldResultMap">
+        select o.*,d.*,ro.*,u.*,rt.* from oldman o
+        left join disease d on o.disease_id=d.id
+        left join room ro on o.roomid=ro.id
+        left join user u on u.id=o.user_id
+        left join roomType rt on rt.id=ro.roomtype_id
+        <where>
+            <if test="old_code!=null and old_code!=''">
+                and o.old_code like CONCAT('%',#{old_code},'%')
+            </if>
+            <if test="old_name!=null and old_name!=''">
+                and o.old_name like CONCAT('%',#{old_name},'%')
+            </if>
+            <if test="roomid!=null and roomid!=''">
+                and o.roomid=#{roomid}
+            </if>
+        </where>
+        limit #{startRow},#{endRow}
+    </select>
+    <!--删除-->
+    <delete id="deleteold" parameterType="int">
+        delete from oldman where id=#{id}
+    </delete>
+    <select id="findbyoldcode" resultType="Oldman">
+        select * from oldman where old_code=#{old_code}
+    </select>
+    <!--添加-->
+    <insert id="addoldmaninfo" parameterType="Oldman">
+        insert into oldman (old_code,old_name,old_age,old_gender,disease_id,roomid,user_id) values (#{old_code},#{old_name},#{old_age},#{old_gender},#{disease_id},#{roomid},#{user_id});
+    </insert>
+    <select id="findbyoldid" resultType="Oldman">
+        select * from oldman where id=#{id}
+    </select>
+    <update id="editoldinfo" parameterType="Oldman">
+        update oldman set old_name=#{old_name},old_age=#{old_age},old_gender=#{old_gender},disease_id=#{disease_id},roomid=#{roomid},user_id=#{user_id} where old_code=#{old_code}
+    </update>
+    <select id="findoldcount" resultType="int">
+        select count(*) from oldman
+        <where>
+            <if test="old_code!=null and old_code!=''">
+                and old_code like CONCAT('%',#{old_code},'%')
+            </if>
+            <if test="old_name!=null and old_name!=''">
+                and old_name like CONCAT('%',#{old_name},'%')
+            </if>
+            <if test="roomid!=null and roomid!=''">
+                and roomid=#{roomid}
+            </if>
+        </where>
+    </select>
+    <select id="forgetoldname" resultMap="OldResultMap">
+        select o.id,o.old_code,o.old_name from oldman o;
+    </select>
+    <select id="findoldname" parameterType="int" resultType="Oldman">
+        select old_name from oldman where id=#{id}
+    </select>
+    <select id="getPeoCount" parameterType="int" resultType="int">
+        select peoNum from room where id = #{roomid}
+    </select>
+    <insert id="setPeoCount" parameterType="int">
+        update room set peoNum = #{peoNum} where id=#{room_id}
+    </insert>
+</mapper>

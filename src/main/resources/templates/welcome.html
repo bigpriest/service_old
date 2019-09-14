@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" th:href="@{/static/css/font.css}">
+    <link rel="stylesheet" th:href="@{/static/css/xadmin.css}">
+    <script th:src="@{/static/js/jquery.min.js}"></script>
+    <script th:src="@{/static/lib/layui/layui.js}" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+</head>
+<script>
+    // 这个cg就是span的id，初始化Date时间并转化为字符string类型,每1000毫秒，setInterval() 就会调用函数，直到被关闭。
+    setInterval("cg.innerHTML=date2str(new Date(),'yyyy-MM-dd hh:mm:ss')", 1000);
+</script>
+<script type="text/javascript">
+    function date2str(x, y) {
+        var z = {
+            y: x.getFullYear(),
+            M: x.getMonth() + 1,
+            d: x.getDate(),
+            h: x.getHours(),
+            m: x.getMinutes(),
+            s: x.getSeconds()
+        };
+        return y.replace(/(y+|M+|d+|h+|m+|s+)/g, function (v) {
+            return ((v.length > 1 ? "0" : "") + eval('z.' + v.slice(-1))).slice(-(v.length > 2 ? v.length : 2))
+        });
+    }
+</script>
+<body>
+<div class="x-body layui-anim layui-anim-up">
+    <blockquote class="layui-elem-quote">欢迎管理员：
+        <span class="x-red" th:text="${session.username}"></span>！当前时间:<span id="cg"></span>
+        <div class="top" th:switch="${session.flag}">
+            <div class="logo" th:case="'true'">
+                <a class="x-red" style="font-size: 20px" th:onClick="personInfo([[${session.username}]]);">请完善个人信息！</a>
+            </div>
+        </div>
+    </blockquote>
+    <fieldset class="layui-elem-field">
+        <legend>系统信息</legend>
+        <div class="layui-field-box">
+            <table class="layui-table">
+                <tbody>
+                <tr>
+                    <th>系统名称</th>
+                    <td>基于springboot+maybatis的养老管理系统</td>
+                </tr>
+                <tr>
+                    <th>访问地址</th>
+                    <td>http://localhost:8080/larController/log</td>
+                </tr>
+                <tr>
+                    <th>操作系统</th>
+                    <td>WIN 10专业版</td></tr>
+                <tr>
+                    <th>运行环境</th>
+                    <td>idea 2019.1.3</td></tr>
+                <tr>
+                    <th>MYSQL版本</th>
+                    <td>5.5.38</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+    <fieldset class="layui-elem-field">
+        <legend>开发团队</legend>
+        <div class="layui-field-box">
+            <table class="layui-table">
+                <tbody>
+                <tr>
+                    <th>技术支持</th>
+                    <td>Java、Springboot、Mybatis、ajax、shiro</td>
+                </tr>
+                <tr>
+                    <th>团队成员</th>
+                    <td>方俊杰、方正友、庄天任、施文强</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+</div>
+<script type="text/javascript">
+    function personInfo(username) {
+        x_admin_show('个人信息', "/userInfo/all/" + username);
+    }
+</script>
+</body>
+</html>

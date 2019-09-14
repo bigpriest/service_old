@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="makert.makert_demo.dao.RoomMapper">
+    <resultMap id="roommap" type="Room">
+        <id property="id" column="id"/>
+        <result property="room_code" column="room_code"/>
+        <result property="room_address" column="room_address"/>
+        <result property="room_descript" column="room_descript"/>
+        <result property="peoNum" column="peoNum"/>
+        <result property="createtime" column="createtime"/>
+        <association property="roomType" column="roomtype_id" javaType="RoomType">
+            <id property="id" column="id"/>
+            <result property="roomtypecode" column="roomtypecode"/>
+            <result property="roomtype" column="roomtype"/>
+        </association>
+    </resultMap>
+    <select id="roominfo" resultMap="roommap">
+        select r.*,rt.*
+        from room r left join roomtype rt on r.roomtype_id=rt.id
+        <where>
+            <if test="room_code!=null and room_code!=''">
+                and room_code like CONCAT('%',#{room_code},'%')
+            </if>
+            <if test="roomtype_id!=null and roomtype_id!=''">
+                and roomtype_id=#{roomtype_id}
+            </if>
+        </where>
+        limit #{startRow},#{endRow}
+    </select>
+    <select id="findroomcount" resultType="int">
+        select count(*) from room
+        <where>
+            <if test="room_code!=null and room_code!=''">
+                and room_code like CONCAT('%',#{room_code},'%')
+            </if>
+            <if test="roomtype_id!=null and roomtype_id!=''">
+                and roomtype_id=#{roomtype_id}
+            </if>
+        </where>
+    </select>
+    <select id="findroom" resultMap="roommap">
+        select * from room;
+    </select>
+    <delete id="delroom" parameterType="int">
+        delete from room where id=#{id}
+    </delete>
+    <insert id="addroom" parameterType="Room">
+        insert into room (room_code,roomtype_id,room_address,room_descript,createtime,peoNum)
+        values (#{room_code},#{roomtype_id},#{room_address},#{room_descript},#{createtime},#{roomtype_id});
+    </insert>
+    <select id="findbyid" resultType="Room">
+        select * from room where id=#{id}
+    </select>
+    <update id="editroom" parameterType="Room">
+        update room set roomtype_id=#{roomtype_id},room_address=#{room_address},room_descript=#{room_descript},peoNum=#{roomtype_id}
+        where room_code=#{room_code};
+    </update>
+</mapper>
